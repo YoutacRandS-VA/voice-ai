@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FutureVoice.AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Cairo', sans-serif;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4rem;
+      position: relative;
+    }
+    header::before {
+      content: "";
+      position: absolute;
+      bottom: -2rem;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(255,255,255,0), #fff, rgba(255,255,255,0));
+    }
+    .logo {
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: linear-gradient(45deg, #00f, #0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    nav ul {
+      display: flex;
+      list-style: none;
+    }
+    nav li {
+      margin-right: 2.5rem;
+    }
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.2rem;
+      transition: color 0.3s;
+      position: relative;
+    }
+    nav a::before {
+      content: "";
+      position: absolute;
+      bottom: -5px;
+      right: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, #00f, #0ff);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+    nav a:hover::before {
+      transform: scaleX(1);
+    }
+    h1 {
+      font-size: 6rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      text-align: center;
+      background: linear-gradient(45deg, #00f, #0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .textarea-container {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 2rem;
+      border-radius: 1rem;
+      margin-bottom: 4rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      position: relative;
+      overflow: hidden;
+    }
+    .textarea-container::before {
+      content: "";
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      left: -20px;
+      bottom: -20px;
+      background: linear-gradient(45deg, #00f, #0ff);
+      z-index: -1;
+      filter: blur(40px);
+      opacity: 0.5;
+    }
+    textarea {
+      width: 100%;
+      background-color: transparent;
+      border: none;
+      min-height: 300px;
+      color: #fff;
+      font-size: 1.3rem;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+      direction: rtl;
+    }
+    .textarea-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+    .btn {
+      background: linear-gradient(45deg, #00f, #0ff);
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 0.5rem;  
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.3s;
+      font-size: 1.1rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .btn:hover {
+      opacity: 0.8;
+    }
+    .character-count {
+      color: #aaa;
+      font-size: 1.1rem;
+    }
+    .section-header {
+      font-size: 4rem;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      text-align: center;
+      background: linear-gradient(45deg, #00f, #0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      display: block;
+      width: 100%;
+      margin: auto;
+    }
+    .voice-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 3rem;
+    }
+    .voice-item {
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 2.5rem;
+      border-radius: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, background-color 0.3s;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+    .voice-item::before {
+      content: "";
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      left: -20px;
+      bottom: -20px;
+      background: linear-gradient(45deg, #00f, #0ff);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: -1;
+    }
+    .voice-item:hover {
+      transform: translateY(-15px);
+    }
+    .voice-item:hover::before {
+      opacity: 0.3;
+    }
+    .voice-item.selected {
+      background-color: rgba(0, 0, 255, 0.2); /* Highlighted background color for selected item */
+    }
+    .avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin: 0 auto 2rem;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .voice-item h3 {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      background: linear-gradient(45deg, #00f, #0ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .voice-item p {
+      font-size: 1.2rem;
+      color: #aaa;
+    }
+    footer {
+      text-align: center;
+      margin-top: 6rem;
+      color: #aaa;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">FutureVoice.AI</div>
+      <nav>
+        <ul>
+          <li><a href="#">الصفحة الرئيسية</a></li>
+          <li><a href="#">الأصوات</a></li>
+          <li><a href="#">حول</a></li>
+          <li><a href="#">اتصل بنا</a></li>
+        </ul>
+      </nav>
+    </header>
+    <h1>مولد الصوت بالذكاء الاصطناعي</h1>
+    <div class="textarea-container">
+      <textarea placeholder="اكتب أو الصق النص هنا..."></textarea>
+      <div class="textarea-footer">
+        <span class="character-count">عدد الأحرف: 0</span>
+        <button class="btn">مسح</button>
+      </div>
+    </div>
+<h2 class="section-header">اختر صوتًا</h2>
+<div class="voice-grid">
+  <!-- Speakers with their descriptions -->
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/1.png" alt="مقدم">
+    </div>
+    <h3>Joe Rogan</h3>
+    <p>مقدم</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/2.jpeg" alt="سياسي">
+    </div>
+    <h3>Obama</h3>
+    <p>سياسي</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/3.jpeg" alt="علم نفسي">
+    </div>
+    <h3>Jordan Peterson</h3>
+    <p>علم نفسي</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/4.png" alt="سياسي">
+    </div>
+    <h3>Trump</h3>
+    <p>سياسي</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/7.png" alt="مبتكر">
+    </div>
+    <h3>Elon Musk</h3>
+    <p>مبتكر</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/8.jpeg" alt="رياضي">
+    </div>
+    <h3>Andrew Tate</h3>
+    <p>رياضي</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/9.jpeg" alt="معلق">
+    </div>
+    <h3>Ben Shapiro</h3>
+    <p>معلق</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/10.png" alt="ممثل">
+    </div>
+    <h3>Morgan Freeman</h3>
+    <p>ممثل</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/11.png" alt="مغنية">
+    </div>
+    <h3>Taylor Swift</h3>
+    <p>مغنية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/12.png" alt="موسيقار">
+    </div>
+    <h3>Kanye West</h3>
+    <p>موسيقار</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/17.png" alt="سياسي">
+    </div>
+    <h3>Joe Biden</h3>
+    <p>سياسي</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/18.png" alt="مغنية">
+    </div>
+    <h3>Ice Spice</h3>
+    <p>مغنية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/19.png" alt="شخصية">
+    </div>
+    <h3>Homer Simpson</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/20.png" alt="مغنية">
+    </div>
+    <h3>Dua Lipa</h3>
+    <p>مغنية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/21.png" alt="شخصية">
+    </div>
+    <h3>SpongeBob</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/22.png" alt="مغنية">
+    </div>
+    <h3>Billie Eilish</h3>
+    <p>مغنية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/23.png" alt="شخصية">
+    </div>
+    <h3>Tony Stark</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/26.png" alt="سياسي">
+    </div>
+    <h3>Arnold</h3>
+    <p>سياسي</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/29.png" alt="مغني">
+    </div>
+    <h3>Ed Sheeran</h3>
+    <p>مغني</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/30.jpeg" alt="ممثل">
+    </div>
+    <h3>Leo DiCaprio</h3>
+    <p>ممثل</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/32.png" alt="مغني">
+    </div>
+    <h3>Eminem</h3>
+    <p>مغني</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/33.png" alt="شخصية">
+    </div>
+    <h3>Peter Griffin</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/34.png" alt="مشهورة">
+    </div>
+    <h3>Kylie Jenner</h3>
+    <p>مشهورة</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/35.png" alt="مغني">
+    </div>
+    <h3>KSI</h3>
+    <p>مغني</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/37.png" alt="شخصية">
+    </div>
+    <h3>Eric Cartman</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/38.png" alt="مقدم">
+    </div>
+    <h3>David Attenborough</h3>
+    <p>مقدم</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/45.jpeg" alt="معلق">
+    </div>
+    <h3>Pew Die Pie</h3>
+    <p>معلق</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/47.jpeg" alt="مغنية">
+    </div>
+    <h3>Ariana Grande</h3>
+    <p>مغنية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/48.jpeg" alt="شخصية">
+    </div>
+    <h3>Patrick Star</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/49.jpeg" alt="شخصية">
+    </div>
+    <h3>Rick</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/50.jpeg" alt="مغني">
+    </div>
+    <h3>Kendrick Lamar</h3>
+    <p>مغني</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/51.png" alt="شخصية">
+    </div>
+    <h3>Sheldon Plankton</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/52.png" alt="شخصية">
+    </div>
+    <h3>Bart Simpson</h3>
+    <p>شخصية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/55.png" alt="مغني">
+    </div>
+    <h3>The Weeknd</h3>
+    <p>مغني</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/56.jpeg" alt="مغنية">
+    </div>
+    <h3>Rihanna</h3>
+    <p>مغنية</p>
+  </div>
+  <div class="voice-item">
+    <div class="avatar">
+      <img src="assets/57.jpeg" alt="مغني">
+    </div>
+    <h3>Travis Scott</h3>
+    <p>مغني</p>
+  </div>
+</div>
+
+  <script>
+    const textarea = document.querySelector('textarea');
+    const characterCount = document.querySelector('.character-count');
+    const clearBtn = document.querySelector('.btn');
+
+    textarea.addEventListener('input', () => {
+      const length = textarea.value.length;
+      characterCount.textContent = `عدد الأحرف: ${length}`;
+    });
+
+    clearBtn.addEventListener('click', () => {
+      textarea.value = '';
+      characterCount.textContent = 'عدد الأحرف: 0';
+    });
+  </script>
+</body>
+</html>
